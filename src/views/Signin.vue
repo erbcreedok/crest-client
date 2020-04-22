@@ -1,0 +1,35 @@
+<template>
+  <div class="home">
+    Welcome to the Crest online! <br/>
+    <br/>
+    <form @submit.prevent="handleSubmit">
+      <label for="name">Enter your name</label>
+      <input required id="name" name="name" type="text" v-model="name"/><br/>
+
+      <label for="room">Enter room code</label>
+      <input id="room" name="room" type="text" v-model="room"/><br/>
+
+      <button type="submit">Начать игру</button>
+    </form>
+  </div>
+</template>
+<script>
+import client from '../client/client';
+
+export default {
+  name: 'Signin',
+  data() {
+    return {
+      name: '',
+      room: '',
+    };
+  },
+  methods: {
+    handleSubmit() {
+      client.post('user', { name: this.name, room: this.room }).then((res) => {
+        this.$emit('userFetched', res.data);
+      });
+    },
+  },
+};
+</script>

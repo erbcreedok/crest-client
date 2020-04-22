@@ -1,18 +1,41 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <Signin @userFetched="setUser"/>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
+import Signin from '@/views/Signin.vue';
+import client from '../client/client';
 
 export default {
   name: 'Home',
-  components: {
-    HelloWorld,
+  components: { Signin },
+  computed: {
+    user() {
+      return this.$store.state.user;
+    },
+  },
+  methods: {
+    getUser() {
+      return client.get('user').then((res) => res.data);
+    },
+    setUser(user) {
+      if (!user) {
+        return;
+      }
+      this.$store.commit('setUser', user);
+      this.$router.push({ name: 'Room', params: { id: user.room } });
+    },
+  },
+  mounted() {
+    this.getUser().then((user) => {
+      if (!user) {
+        return;
+      }
+      this.$dialog
+        .confirm(`Are you ${user.name}?`, { okText: 'Yes', cancelText: 'No' })
+        .then(() => this.setUser(user));
+    });
   },
 };
+
 </script>
