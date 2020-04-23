@@ -1,18 +1,27 @@
 <template>
   <div class="room">
-    ROOM {{id}}
+    ROOM {{id}}<br/>
+    Room status: {{state}}<br/>
+    <PlayerController v-if="socket" :socket="socket"/>
+    <Player v-for="player in players" :key="player.id" v-bind="player"/>
   </div>
 </template>
 
 <script>
 import io from 'socket.io-client';
+import Player from '@/components/Player.vue';
+import PlayerController from '@/components/PlayerController.vue';
 
 export default {
   name: 'Room',
+  components: { PlayerController, Player },
   props: ['id'],
   data() {
     return {
       socket: null,
+      players: [],
+      state: null,
+      game: null,
     };
   },
   mounted() {
@@ -29,13 +38,22 @@ export default {
       this.socket.on('connect', this.handleSocketConnect);
       this.listenSocket();
     },
-    handleSocketConnect(...args) {
-      console.log('connected', ...args);
+    handleRoomUpdate({ players, state, game }) {
+      this.players = players;
+      this.state = state;
+      this.game = game;
+    },
+    handleSocketConnect() {
+      this.getRoomData();
+    },
+    getRoomData() {
+      this.socket.emit('get room data', this.handleRoomUpdate);
     },
     listenSocket() {
       this.socket.on('exception', (...args) => {
-        console.log('exception', ...args);
+        console.error('exception', ...args);
       });
+      this.socket.on('room update', this.handleRoomUpdate);
     },
   },
 };
