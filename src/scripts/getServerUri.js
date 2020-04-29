@@ -1,5 +1,5 @@
 function getServerUri() {
-  return 'http://crest-server.herokuapp.com';
+  return 'https://crest-server.herokuapp.com';
 }
 
 export default getServerUri;
