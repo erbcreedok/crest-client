@@ -1,7 +1,5 @@
-function getServerUri(port) {
-  const { protocol, hostname } = window.location;
-  const originalPort = port || window.location.port;
-  return `${protocol}//${hostname}:${originalPort}`;
+function getServerUri() {
+  return 'http://crest-server.herokuapp.com';
 }
 
 export default getServerUri;
