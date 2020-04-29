@@ -1,7 +1,8 @@
 import axios from 'axios';
+import getServerUri from '../scripts/getServerUri';
 
 const client = axios.create({
-  baseURL: 'https://crest-server.herokuapp.com/',
+  baseURL: getServerUri(),
   timeout: 15000,
   withCredentials: true,
 });
