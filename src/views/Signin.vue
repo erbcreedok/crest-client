@@ -3,6 +3,7 @@
     Welcome to the Crest online! <br/>
     <br/>
     <form @submit.prevent="handleSubmit">
+      <span v-if="error" style="color: red"> {{error}}</span><br/>
       <label for="name">Enter your name</label>
       <input required id="name" name="name" type="text" v-model="name"/><br/>
 
@@ -22,12 +23,15 @@ export default {
     return {
       name: '',
       room: '',
+      error: '',
     };
   },
   methods: {
     handleSubmit() {
       client.post('user', { name: this.name, room: this.room }).then((res) => {
         this.$emit('userFetched', res.data);
+      }).catch((err) => {
+        this.error = err;
       });
     },
   },
