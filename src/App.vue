@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import './style/main.less';
 import { version } from '../package.json';
 
 export default {

@@ -1,35 +1,43 @@
 <template>
-  <div>
+  <div class="player_controller">
     <template v-if="player.state === 'wait'">
-      <button v-if="!isReady" @click="setReadyState(true)">I'm ready</button>
-      <button v-if="isReady" @click="setReadyState(false)">I'm not ready</button>
+      <div class="player_controller-ready_controller">
+        <span class="player_controller-ready_state">
+          {{isReady ? 'You ready' : 'Waiting'}}
+        </span>
+        <button class="player_controller-ready_button"
+                :class="{
+                    'player_controller-ready_button-success': !isReady,
+                    'player_controller-ready_button-danger': isReady,
+                }"
+                @click="setReadyState(!isReady)"
+        >
+          {{isReady ? 'Wait' : 'Go!'}}
+        </button>
+      </div>
     </template>
     <template v-else>
-      <template v-if="player.state === 'idle'">
-        <span v-for="card in sortedCards" :key="card.id">
-          <Card v-bind="card" style="display: inline-block; width: 50px"/>
-        </span>
-      </template>
-      <template v-if="player.state === 'turn'">
-        <Card v-for="card in sortedCards" :key="card.id"
-              v-bind="card"
-              style="cursor: pointer; display: inline-block; margin: 0 5px; width: 50px"
-              @click="sendCard(card)"/>
-        <div>
-          <button @click="takeCard">Take card</button>
-        </div>
-      </template>
+      <button v-if="player.state === 'turn'"
+              class="player_controller-take_card"
+              @click="takeCard"
+      >
+        Take card
+      </button>
+      <PlayerHand v-if="player && player.cards"
+                  :cards="player.cards"
+                  :is-turn="player.state === 'turn'"
+                  @cardmove="sendCard"
+      />
     </template>
   </div>
 </template>
 
 <script>
-import Card from '@/components/Card.vue';
-import sortCards from '@/scripts/sortCards';
+import PlayerHand from '@/components/PlayerHand.vue';
 
 export default {
   name: 'player-controller',
-  components: { Card },
+  components: { PlayerHand },
   props: ['socket'],
   data() {
     return {
@@ -41,9 +49,6 @@ export default {
     },
     isReady() {
       return this.player.isReady;
-    },
-    sortedCards() {
-      return !this.player ? [] : sortCards(this.player.cards);
     },
   },
   mounted() {
@@ -80,3 +85,51 @@ export default {
   },
 };
 </script>
+
+<style lang="less">
+  .player_controller {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    padding: 0 20px;
+    &-ready_controller {
+      display: flex;
+      height: 100px;
+      align-items: center;
+      justify-content: center;
+    }
+    &-ready_state {
+      color: white;
+      line-height: 100px;
+    }
+    &-ready_button {
+      display: block;
+      width: 80px;
+      height: 80px;
+      margin: 0 20px;
+      border-radius: 50%;
+      font-size: 30px;
+      &-success {
+        background: darkblue;
+        color: white;
+      }
+      &-danger {
+        background: red;
+        color: white;
+      }
+    }
+    &-take_card {
+      width: 80px;
+      position: absolute;
+      top: -70px;
+      height: 40px;
+      left: 0; right: 0;
+      margin: auto;
+      background: white;
+      color: black;
+      border-radius: 20px;
+    }
+  }
+</style>

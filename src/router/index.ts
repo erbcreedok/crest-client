@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import store from '../store';
 import Home from '../views/Home.vue';
 import Room from '../views/Room.vue';
+import RoomOld from '../views/RoomOld.vue';
 
 Vue.use(VueRouter);
 
@@ -16,6 +17,19 @@ const routes: Array<RouteConfig> = [
     path: '/room:id',
     name: 'Room',
     component: Room,
+    props: true,
+    beforeEnter: (to, from, next) => {
+      if (store.state.user) {
+        next();
+      } else {
+        next({ name: 'Home' });
+      }
+    },
+  },
+  {
+    path: '/devroom:id',
+    name: 'RoomOld',
+    component: RoomOld,
     props: true,
     beforeEnter: (to, from, next) => {
       if (store.state.user) {

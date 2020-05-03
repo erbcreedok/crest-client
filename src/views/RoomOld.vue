@@ -1,21 +1,28 @@
 <template>
-  <div class="room">
-    <Players :players="opponents"/>
-    <Desk v-if="game" :cards="game.desk"/>
+  <div class="room_old">
+    ROOM {{id}}<br/>
+    Room status: {{state}}<br/>
     <PlayerController v-if="socket" :socket="socket"/>
+    <Player v-for="player in players" :key="player.id" v-bind="player"/>
+    <div v-if="game && game.desk">
+      <Card v-for="card in game.desk"
+            :key="card.id"
+            v-bind="card"
+            style="display: inline-block; width: 50px;"/>
+    </div>
   </div>
 </template>
 
 <script>
 import io from 'socket.io-client';
+import Card from '@/components/Card.vue';
+import Player from '@/components/Player.vue';
+import PlayerController from '@/components/PlayerControllerOld.vue';
 import getServerUri from '@/scripts/getServerUri';
-import Players from '@/components/Players.vue';
-import PlayerController from '@/components/PlayerController.vue';
-import Desk from '@/components/Desk.vue';
 
 export default {
-  name: 'Room',
-  components: { Desk, PlayerController, Players },
+  name: 'RoomOld',
+  components: { PlayerController, Player, Card },
   props: ['id'],
   data() {
     return {
@@ -31,13 +38,6 @@ export default {
   computed: {
     user() {
       return this.$store.state.user;
-    },
-    opponents() {
-      const userIndex = this.players.findIndex((player) => this.user && player.id === this.user.id);
-      if (userIndex === -1) {
-        return this.players;
-      }
-      return [...this.players.slice(userIndex + 1), ...this.players.slice(0, userIndex)];
     },
   },
   methods: {
@@ -66,13 +66,3 @@ export default {
   },
 };
 </script>
-
-<style>
-  .room {
-    height: 100vh;
-    width: 100vw;
-    background: rgb(17,83,0);
-    background: radial-gradient(circle, rgba(36,124,6,1) 0%, rgba(17,83,0,1) 100%);
-
-  }
-</style>

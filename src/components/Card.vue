@@ -1,6 +1,6 @@
 <template>
   <div class="card" @click="emitClick">
-    <img :src="imageSrc" alt="" style="width: 100%">
+    <img :src="imageSrc" alt="" style="width: 100%;">
   </div>
 </template>
 <script>

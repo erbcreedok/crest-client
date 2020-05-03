@@ -1,6 +1,6 @@
 {
   "name": "crest-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -16,6 +16,8 @@
     "socket.io-client": "^2.3.0",
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
+    "vue2-touch-events": "^2.2.1",
+    "vuedraggable": "^2.23.2",
     "vuejs-dialog": "^1.4.1",
     "vuex": "^3.1.3"
   },
