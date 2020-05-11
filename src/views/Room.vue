@@ -3,9 +3,9 @@
     <div class="room_info">
       #{{id}} <button class="room_invite_button" @click="saveUriToClipboard">invite</button>
     </div>
-    <Players :players="opponents"/>
+    <Players :players="opponents" :admin-id="adminId"/>
     <Desk v-if="game" :cards="game.desk"/>
-    <PlayerController v-if="socket" :socket="socket"/>
+    <PlayerController v-if="socket" :socket="socket" :adminId="adminId"/>
   </div>
 </template>
 
@@ -27,6 +27,7 @@ export default {
       players: [],
       state: null,
       game: null,
+      adminId: null,
     };
   },
   mounted() {
@@ -55,10 +56,16 @@ export default {
       this.socket.on('connect', this.handleSocketConnect);
       this.listenSocket();
     },
-    handleRoomUpdate({ players, state, game }) {
+    handleRoomUpdate({
+      players,
+      state,
+      game,
+      adminId,
+    }) {
       this.players = players;
       this.state = state;
       this.game = game;
+      this.adminId = adminId;
     },
     handleSocketConnect() {
       this.getRoomData();
@@ -67,8 +74,9 @@ export default {
       this.socket.emit('get room data', this.handleRoomUpdate);
     },
     listenSocket() {
-      this.socket.on('exception', (...args) => {
-        console.error('exception', ...args);
+      this.socket.on('exception', (message) => {
+        console.error('exception', message);
+        this.$notify({ type: 'error', text: message });
       });
       this.socket.on('room update', this.handleRoomUpdate);
     },

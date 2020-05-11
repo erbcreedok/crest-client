@@ -1,9 +1,13 @@
 <template>
   <div class="player_block"
-       :class="{ 'player_block-turn': state==='turn' }"
+       :class="{
+          'player_block-turn': state==='turn',
+          'player_block-offline': !isConnected,
+       }"
   >
+    <img v-if="isAdmin" :src="crownImg" alt="admin" class="player_admin"/>
     <div class="player_state">
-      {{state ? 'Ready' : 'Waiting'}}
+      {{playerState}}
     </div>
     <span class="player_name">{{name}}</span>
     <div class="player_hands">
@@ -21,14 +25,27 @@
 
 <script>
 import cardBackImg from '../assets/cards/back.jpg';
+import crownImg from '../assets/crown.png';
 
 export default {
   name: 'Player',
-  props: ['id', 'name', 'state', 'cardsCount', 'isReady', 'isConnected', 'firstWinCount', 'loseCount'],
+  props: ['id', 'name', 'state', 'cardsCount', 'isReady', 'isConnected', 'firstWinCount', 'loseCount', 'isAdmin'],
   data() {
     return {
       cardBackImg,
+      crownImg,
     };
+  },
+  computed: {
+    playerState() {
+      if (!this.isConnected) {
+        return 'Offline';
+      }
+      if (!this.isReady) {
+        return 'Waiting';
+      }
+      return 'Ready';
+    },
   },
   methods: {
     calculateCardStyle(index, total) {
@@ -52,6 +69,11 @@ export default {
         border: 3px solid white;
       }
     }
+    &-offline {
+      opacity: .5;
+      pointer-events: none;
+      filter: grayscale(1);
+    }
   }
   .player_state {
     display: block;
@@ -67,6 +89,14 @@ export default {
     font-size: 10px;
     text-align: center;
     line-height: 46px;
+  }
+  .player_admin {
+    position: absolute;
+    display: block;
+    top: -13px;
+    left: 20px;
+    width: 24px;
+    transform: rotate(-25deg);
   }
   .player_name {
     font-size: 14px;

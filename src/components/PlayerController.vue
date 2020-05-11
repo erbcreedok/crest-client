@@ -12,7 +12,13 @@
                 }"
                 @click="setReadyState(!isReady)"
         >
-          {{isReady ? 'Wait' : 'Go!'}}
+          {{isReady ? 'Wait' : 'Ready'}}
+        </button>
+        <button class="player_controller-ready_button player_controller-ready_button-success"
+                v-if="isReady && player.id === adminId"
+                @click="startGame"
+        >
+          Go!
         </button>
       </div>
     </template>
@@ -38,7 +44,7 @@ import PlayerHand from '@/components/PlayerHand.vue';
 export default {
   name: 'player-controller',
   components: { PlayerHand },
-  props: ['socket'],
+  props: ['socket', 'adminId'],
   data() {
     return {
     };
@@ -82,6 +88,9 @@ export default {
     takeCard() {
       this.socket.emit('take card');
     },
+    startGame() {
+      this.socket.emit('start room game');
+    },
   },
 };
 </script>
@@ -110,7 +119,7 @@ export default {
       height: 80px;
       margin: 0 20px;
       border-radius: 50%;
-      font-size: 30px;
+      font-size: 24px;
       &-success {
         background: darkblue;
         color: white;
