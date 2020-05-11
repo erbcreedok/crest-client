@@ -4,6 +4,7 @@
     <span style="opacity: 0.3; font-size: 8px; position: fixed; bottom: 0;">
       version: {{version}}
     </span>
+    <notifications position="bottom center"/>
   </div>
 </template>
 

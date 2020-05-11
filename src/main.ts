@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VuejsDialog from 'vuejs-dialog';
 import Vue2TouchEvents from 'vue2-touch-events';
+import Notifications from 'vue-notification';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
@@ -9,6 +10,7 @@ import store from './store';
 import 'vuejs-dialog/dist/vuejs-dialog.min.css';
 
 Vue.use(VuejsDialog);
+Vue.use(Notifications);
 Vue.use(Vue2TouchEvents, {
   disableClick: true,
 });

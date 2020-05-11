@@ -1,5 +1,8 @@
 <template>
   <div class="room">
+    <div class="room_info">
+      #{{id}} <button class="room_invite_button" @click="saveUriToClipboard">invite</button>
+    </div>
     <Players :players="opponents"/>
     <Desk v-if="game" :cards="game.desk"/>
     <PlayerController v-if="socket" :socket="socket"/>
@@ -12,6 +15,7 @@ import getServerUri from '@/scripts/getServerUri';
 import Players from '@/components/Players.vue';
 import PlayerController from '@/components/PlayerController.vue';
 import Desk from '@/components/Desk.vue';
+import saveToClipboard from '@/scripts/saveToClipboard';
 
 export default {
   name: 'Room',
@@ -41,6 +45,11 @@ export default {
     },
   },
   methods: {
+    saveUriToClipboard() {
+      const uri = window.location.href;
+      saveToClipboard(uri);
+      this.$notify('Link copied to your clipboard');
+    },
     connectToRoom() {
       this.socket = io.connect(`${getServerUri(3333)}?room=${this.id}&user=${this.user.id}`);
       this.socket.on('connect', this.handleSocketConnect);
@@ -73,6 +82,22 @@ export default {
     width: 100vw;
     background: rgb(17,83,0);
     background: radial-gradient(circle, rgba(36,124,6,1) 0%, rgba(17,83,0,1) 100%);
-
+  }
+  .room_info {
+    color: white;
+    font-size: 20px;
+    position: fixed;
+    top: 10px;left: 10px;right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+  .room_invite_button {
+    color: white;
+    background: #1646ff;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 8px 12px;
   }
 </style>
