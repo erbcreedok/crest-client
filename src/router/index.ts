@@ -12,6 +12,13 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
+    props: true,
+  },
+  {
+    path: '/defRoom:defRoom',
+    name: 'DefRoom',
+    component: Home,
+    props: true,
   },
   {
     path: '/room:id',
@@ -22,7 +29,7 @@ const routes: Array<RouteConfig> = [
       if (store.state.user) {
         next();
       } else {
-        next({ name: 'Home' });
+        next({ name: 'DefRoom', params: { defRoom: to.params.id } });
       }
     },
   },

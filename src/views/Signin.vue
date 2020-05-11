@@ -19,10 +19,11 @@ import client from '../client/client';
 
 export default {
   name: 'Signin',
+  props: ['defRoom'],
   data() {
     return {
       name: '',
-      room: '',
+      room: this.defRoom,
       error: '',
     };
   },
@@ -31,7 +32,7 @@ export default {
       client.post('user', { name: this.name, room: this.room }).then((res) => {
         this.$emit('userFetched', res.data);
       }).catch((err) => {
-        this.error = err;
+        this.error = err.response.data.message;
       });
     },
   },

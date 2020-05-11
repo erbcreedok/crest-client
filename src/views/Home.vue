@@ -1,5 +1,5 @@
 <template>
-  <Signin @userFetched="setUser"/>
+  <Signin @userFetched="setUser" :def-room="defRoom"/>
 </template>
 
 <script>
@@ -8,6 +8,7 @@ import client from '../client/client';
 
 export default {
   name: 'Home',
+  props: ['defRoom'],
   components: { Signin },
   computed: {
     user() {
