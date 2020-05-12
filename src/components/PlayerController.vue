@@ -1,5 +1,20 @@
 <template>
-  <div class="player_controller">
+  <div class="player_controller" :style="{zIndex: showEmojiGallery ? '1000' : '1'}">
+    <div class="player_controller_avatar">
+      <div class="player_state"
+           :class="{
+              'player_state-is_turn': player.state === 'turn',
+           }"
+           @click="showEmojiGallery = true">
+        {{player.emoji}}
+      </div>
+      <player-emoji-gallery v-if="showEmojiGallery"
+                            @setAvatar="changeAvatar"
+                            @setEmotion="sendEmotion"
+                            :selected="player.isReady ? 'emotions' : 'avatars'"
+                            @close="showEmojiGallery = false"
+      />
+    </div>
     <template v-if="player.state === 'wait'">
       <div class="player_controller-ready_controller">
         <span class="player_controller-ready_state">
@@ -40,13 +55,15 @@
 
 <script>
 import PlayerHand from '@/components/PlayerHand.vue';
+import PlayerEmojiGallery from '@/components/PlayerEmojiGallery.vue';
 
 export default {
   name: 'player-controller',
-  components: { PlayerHand },
+  components: { PlayerEmojiGallery, PlayerHand },
   props: ['socket', 'adminId'],
   data() {
     return {
+      showEmojiGallery: false,
     };
   },
   computed: {
@@ -56,12 +73,30 @@ export default {
     isReady() {
       return this.player.isReady;
     },
+    playerState() {
+      if (!this.player.isConnected) {
+        return 'Offline';
+      }
+      if (!this.player.isReady) {
+        return 'Waiting';
+      }
+      return 'Ready';
+    },
   },
   mounted() {
     this.getPlayerState();
     this.listenSocket();
   },
   methods: {
+    changeAvatar(avatar) {
+      this.socket.emit('change avatar', avatar, (player) => {
+        this.updateUserState(player);
+        this.showEmojiGallery = false;
+      });
+    },
+    sendEmotion(emotion) {
+      this.socket.emit('emote', emotion);
+    },
     updateUserState(player) {
       this.$store.commit('setUser', player);
     },
@@ -120,6 +155,8 @@ export default {
       margin: 0 20px;
       border-radius: 50%;
       font-size: 24px;
+      padding: 0;
+      text-align: center;
       &-success {
         background: darkblue;
         color: white;
@@ -139,6 +176,23 @@ export default {
       background: white;
       color: black;
       border-radius: 20px;
+    }
+    .player_controller_avatar {
+      position: relative;
+    }
+    .player_state {
+      position: absolute;
+      left: 10px;
+      top: -65px;
+      width: 70px;
+      height: 70px;
+      font-size: 45px;
+      line-height: 70px;
+      &-is_turn {
+        border: 5px solid white;
+        background: rgba(22, 70, 255, 0.33);
+        box-shadow: 0 0 30px 10px #1646ff;
+      }
     }
   }
 </style>

@@ -1,0 +1,56 @@
+.hamburger_menu {
+  display: block;
+  position: relative;
+  background: white;
+  box-sizing: content-box;
+  border-radius: 4px;
+  border: none;
+  appearance: none;
+  cursor: pointer;
+  transition: .2s;
+  .filler {
+    position: absolute;
+    top: -200%;
+    left: 0;
+    right: 0;
+    bottom: -200%;
+    display: block;
+  }
+  &-default {
+    width: 30px;
+    height: 3px;
+  }
+  &:before, &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: inherit;
+    border-radius: 4px;
+    transition: .2s;
+  }
+  &:before {
+    top: -200%;
+    left: 30%
+  }
+  &:after {
+    bottom: -200%;
+    left: 10%;
+  }
+  &-closer {
+    transform: rotate(45deg);
+    &:before {
+      transform: rotate(-90deg) translateX(-25%);
+      transform-origin: center;
+      left: 0;
+    }
+    &:after {
+      transform: rotate(-90deg) translateX(25%);
+      left: 0;
+      visibility: hidden;
+      outline: none;
+    }
+  }
+}

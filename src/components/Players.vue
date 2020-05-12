@@ -5,7 +5,7 @@
          class="player_wrapper"
          :style="calculatePlayerPosition(index, players.length)"
     >
-      <Player v-bind="player" :is-admin="player.id === adminId"/>
+      <Player v-bind="player" :is-admin="player.id === adminId" :socket="socket"/>
     </div>
   </div>
 </template>
@@ -16,7 +16,7 @@ import Player from '@/components/Player.vue';
 export default {
   name: 'Players',
   components: { Player },
-  props: ['players', 'adminId'],
+  props: ['players', 'adminId', 'socket'],
   methods: {
     calculatePlayerPosition(index, total) {
       const degree = 180 / (total + 1);
@@ -36,6 +36,7 @@ export default {
     position: relative;
     justify-content: center;
     padding-top: 20px;
+    overflow: hidden;
   }
   .player_wrapper {
     height: 100%;

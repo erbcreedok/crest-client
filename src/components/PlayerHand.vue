@@ -1,8 +1,5 @@
 <template>
   <div class="player_controller-hand"
-       :class="{
-            'player_controller-hand-on_turn': isTurn,
-       }"
        ref="handWrapper">
     <template v-if="isMounted">
       <div v-for="(card, index) in sortedCards" :key="card.id"
@@ -132,20 +129,6 @@ export default {
     left: 20px;
     right: 20px;
     user-select: none;
-    &-on_turn:before {
-      content: '';
-      position: absolute;
-      display: block;
-      width: 100%;
-      height: 1px;
-      bottom: -30px;
-      left: 0;
-      right: 0;
-      box-shadow: 0 -40px 50px 40px #188aff;
-      pointer-events: none;
-      border-radius: 50%;
-      animation: color_gradiate infinite 5s;
-    }
   }
   .player_controller-card_wrapper {
     width: 80px;

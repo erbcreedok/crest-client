@@ -1,9 +1,16 @@
 <template>
   <div class="room">
     <div class="room_info">
-      #{{id}} <button class="room_invite_button" @click="saveUriToClipboard">invite</button>
+      <span style="opacity: .3">#{{id}}</span>
+      <div class="room_controller_wrapper">
+        <HamburgerMenu :is-close="showSidebar"
+                       @click="showSidebar = !showSidebar"
+                       class="room_controller_toggle"
+        />
+      </div>
+      <room-controller v-if="showSidebar" :room-id="id" :admin-id="adminId" :socket="socket"/>
     </div>
-    <Players :players="opponents" :admin-id="adminId"/>
+    <Players :players="opponents" :admin-id="adminId" :socket="socket"/>
     <Desk v-if="game" :cards="game.desk"/>
     <PlayerController v-if="socket" :socket="socket" :adminId="adminId"/>
   </div>
@@ -15,11 +22,18 @@ import getServerUri from '@/scripts/getServerUri';
 import Players from '@/components/Players.vue';
 import PlayerController from '@/components/PlayerController.vue';
 import Desk from '@/components/Desk.vue';
-import saveToClipboard from '@/scripts/saveToClipboard';
+import RoomController from '@/components/RoomController.vue';
+import HamburgerMenu from '@/views/HamburgerMenu.vue';
 
 export default {
   name: 'Room',
-  components: { Desk, PlayerController, Players },
+  components: {
+    HamburgerMenu,
+    RoomController,
+    Desk,
+    PlayerController,
+    Players,
+  },
   props: ['id'],
   data() {
     return {
@@ -28,6 +42,7 @@ export default {
       state: null,
       game: null,
       adminId: null,
+      showSidebar: false,
     };
   },
   mounted() {
@@ -37,20 +52,19 @@ export default {
     user() {
       return this.$store.state.user;
     },
+    activeUsers() {
+      return this.players.filter((player) => player.isReady || player.isConnected);
+    },
     opponents() {
-      const userIndex = this.players.findIndex((player) => this.user && player.id === this.user.id);
+      const userIndex = this.activeUsers
+        .findIndex((player) => this.user && player.id === this.user.id);
       if (userIndex === -1) {
-        return this.players;
+        return this.activeUsers;
       }
-      return [...this.players.slice(userIndex + 1), ...this.players.slice(0, userIndex)];
+      return [...this.activeUsers.slice(userIndex + 1), ...this.activeUsers.slice(0, userIndex)];
     },
   },
   methods: {
-    saveUriToClipboard() {
-      const uri = window.location.href;
-      saveToClipboard(uri);
-      this.$notify('Link copied to your clipboard');
-    },
     connectToRoom() {
       this.socket = io.connect(`${getServerUri(3333)}?room=${this.id}&user=${this.user.id}`);
       this.socket.on('connect', this.handleSocketConnect);
@@ -100,12 +114,5 @@ export default {
     justify-content: space-between;
     align-items: center;
     z-index: 10;
-  }
-  .room_invite_button {
-    color: white;
-    background: #1646ff;
-    border-radius: 4px;
-    font-size: 14px;
-    padding: 8px 12px;
   }
 </style>

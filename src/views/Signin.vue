@@ -10,7 +10,9 @@
       <label for="room">Enter room code</label>
       <input id="room" name="room" type="text" v-model="room"/><br/>
 
-      <button type="submit">Начать игру</button>
+      <button type="submit">{{room ? 'Присоединиться' :'Начать игру'}}</button>
+      <br/>
+      <button type="button" v-if="room && name" @click="playAsOld">Войти как {{name}}</button>
     </form>
   </div>
 </template>
@@ -30,6 +32,13 @@ export default {
   methods: {
     handleSubmit() {
       client.post('user', { name: this.name, room: this.room }).then((res) => {
+        this.$emit('userFetched', res.data);
+      }).catch((err) => {
+        this.error = err.response.data.message;
+      });
+    },
+    playAsOld() {
+      client.post('old_user', { name: this.name, room: this.room }).then((res) => {
         this.$emit('userFetched', res.data);
       }).catch((err) => {
         this.error = err.response.data.message;
