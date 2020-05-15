@@ -5,14 +5,20 @@
            :class="{
               'player_state-is_turn': player.state === 'turn',
            }"
-           @click="showEmojiGallery = true">
-        {{player.emoji}}
+           @click="openEmojiGallery">
+        {{showEmojiGallery ? 'ⓧ' :player.emoji}}
+        <div class="player_controller_emotions">
+          <div class="player_emotion" v-for="emotion in emotions" :key="emotion.id">
+            {{emotion.value}}
+          </div>
+        </div>
       </div>
-      <player-emoji-gallery v-if="showEmojiGallery"
+      <player-emoji-gallery v-if="showEmojiGallery && !player.isReady"
                             @setAvatar="changeAvatar"
-                            @setEmotion="sendEmotion"
-                            :selected="player.isReady ? 'emotions' : 'avatars'"
                             @close="showEmojiGallery = false"
+      />
+      <player-emotion-controller v-if="showEmojiGallery && player.isReady"
+                                 @setEmotion="sendEmotion"
       />
     </div>
     <template v-if="player.state === 'wait'">
@@ -55,15 +61,17 @@
 
 <script>
 import PlayerHand from '@/components/PlayerHand.vue';
+import PlayerEmotionController from '@/components/PlayerEmotionController.vue';
 import PlayerEmojiGallery from '@/components/PlayerEmojiGallery.vue';
 
 export default {
   name: 'player-controller',
-  components: { PlayerEmojiGallery, PlayerHand },
+  components: { PlayerEmojiGallery, PlayerEmotionController, PlayerHand },
   props: ['socket', 'adminId'],
   data() {
     return {
       showEmojiGallery: false,
+      emotions: [],
     };
   },
   computed: {
@@ -88,6 +96,14 @@ export default {
     this.listenSocket();
   },
   methods: {
+    openEmojiGallery() {
+      if (!this.showEmojiGallery) {
+        this.showEmojiGallery = true;
+        this.emotions = [];
+      } else {
+        this.showEmojiGallery = false;
+      }
+    },
     changeAvatar(avatar) {
       this.socket.emit('change avatar', avatar, (player) => {
         this.updateUserState(player);
@@ -95,6 +111,7 @@ export default {
       });
     },
     sendEmotion(emotion) {
+      this.showEmojiGallery = false;
       this.socket.emit('emote', emotion);
     },
     updateUserState(player) {
@@ -109,6 +126,23 @@ export default {
       this.socket.on('player update', (data) => {
         const p = { ...this.player, ...data };
         this.updateUserState(p);
+      });
+      this.socket.on('emote', (playerId, emotion) => {
+        if (this.player.id === playerId) {
+          const id = (new Date()).getTime().toString();
+          this.emotions.push({
+            id,
+            value: emotion,
+          });
+          setTimeout(() => {
+            const e = [...this.emotions];
+            const index = e.findIndex((em) => em.id === id);
+            if (index !== -1) {
+              e.splice(index, 1);
+              this.emotions = [...e];
+            }
+          }, 1500);
+        }
       });
     },
     setReadyState(data) {
@@ -188,10 +222,35 @@ export default {
       height: 70px;
       font-size: 45px;
       line-height: 70px;
+      color: white;
+      user-select: none;
+      box-sizing: content-box;
       &-is_turn {
         border: 5px solid white;
         background: rgba(22, 70, 255, 0.33);
         box-shadow: 0 0 30px 10px #1646ff;
+      }
+    }
+    &_emotions {
+      .player_emotion {
+        width: 70px;
+        text-align: center;
+        font-size: 50px;
+        position: absolute;
+        top: -30px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        text-shadow: 0 0 10px black;
+        animation: emojiScaleTop .5s ease-out both;
+      }
+      @keyframes emojiScaleTop {
+        from {
+          transform: scale(.4) translateY(0);
+        }
+        to {
+          transform: scale(1) translateY(-100px);
+        }
       }
     }
   }
